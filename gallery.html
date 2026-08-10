@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gallery — Sincerely YAS</title>
+<meta name="description" content="Sincerely YAS Vol. 01 — the full gallery. Shot on film, Canal St., New York.">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" href="assets/favicon-512.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FFFFFF;
+  --ink:#0E0E0E;
+  --ink-55:rgba(14,14,14,.55);
+  --rule:rgba(14,14,14,.16);
+  --red:#D30000;
+  --pad:clamp(18px,3.4vw,44px);
+  --mono:'Roboto Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--paper);color:var(--ink);font-family:var(--mono);
+  font-size:12px;line-height:1.6;letter-spacing:.06em;text-transform:uppercase;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+img{display:block;width:100%;height:auto}
+::selection{background:var(--red);color:#fff}
+
+/* crop marks at the page corners */
+.crop{position:fixed;width:22px;height:22px;z-index:20;pointer-events:none;border:0 solid var(--ink)}
+.crop--tl{top:14px;left:14px;border-top-width:1px;border-left-width:1px}
+.crop--tr{top:14px;right:14px;border-top-width:1px;border-right-width:1px}
+.crop--bl{bottom:14px;left:14px;border-bottom-width:1px;border-left-width:1px}
+.crop--br{bottom:14px;right:14px;border-bottom-width:1px;border-right-width:1px}
+
+.bar{
+  position:sticky;top:0;z-index:15;background:var(--paper);
+  display:flex;align-items:flex-start;justify-content:space-between;gap:24px;
+  padding:26px var(--pad) 22px;
+}
+.bar__logo{height:clamp(28px,3vw,40px);flex:0 0 auto}
+.bar__logo img{height:100%;width:auto}
+.menu{display:grid;grid-template-columns:repeat(4,auto);gap:6px clamp(24px,5vw,90px);font-size:11px;letter-spacing:.14em}
+.menu a{display:flex;align-items:center;gap:9px;white-space:nowrap}
+.menu a::before{content:"";width:7px;height:7px;background:var(--ink);flex:0 0 auto}
+.menu a:hover{color:var(--red)}
+.menu a:hover::before{background:var(--red)}
+.menu a.is-here::before{background:var(--red)}
+@media(max-width:900px){
+  .bar{flex-direction:column;align-items:flex-start}
+  .menu{grid-template-columns:repeat(2,auto);gap:8px 40px}
+}
+
+.head{padding:clamp(34px,7vw,96px) var(--pad) clamp(26px,4vw,54px);display:flex;
+  justify-content:space-between;align-items:baseline;gap:20px;flex-wrap:wrap}
+.head h1{font-weight:300;font-size:clamp(30px,6vw,74px);line-height:1;letter-spacing:-.005em}
+.head .meta{font-size:10px;letter-spacing:.2em;color:var(--ink-55)}
+
+.grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  column-gap:clamp(20px,4.5vw,90px);row-gap:clamp(60px,11vw,190px);
+  padding:0 var(--pad) clamp(80px,12vw,190px);
+}
+.g__item{position:relative;cursor:pointer;align-self:start;background:#FFFFFF}
+.g__item img{aspect-ratio:16/10;object-fit:cover;transition:opacity .4s ease,transform .8s cubic-bezier(.2,.7,.2,1)}
+.g__item:hover img{opacity:.82;transform:translateY(-4px)}
+.g__item figcaption{margin-top:11px;font-size:9px;letter-spacing:.18em;color:var(--ink-55)}
+.g__item:nth-child(4n+2){margin-top:clamp(20px,4vw,70px)}
+.g__item:nth-child(4n+3){margin-top:clamp(10px,2vw,34px)}
+.g__item:nth-child(4n+4){margin-top:clamp(30px,6vw,104px)}
+@media(max-width:900px){
+  .grid{grid-template-columns:repeat(2,1fr);row-gap:clamp(36px,9vw,80px)}
+  .g__item[class]{margin-top:0}
+}
+
+.foot{border-top:1px solid var(--rule);padding:26px var(--pad) 40px;display:flex;
+  justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:9.5px;letter-spacing:.18em;color:var(--ink-55)}
+
+/* lightbox */
+.lb{position:fixed;inset:0;z-index:60;background:rgba(255,255,255,.985);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;visibility:hidden;transition:opacity .3s ease,visibility .3s}
+.lb.is-open{opacity:1;visibility:visible}
+.lb__fig{display:flex;flex-direction:column;align-items:center;max-width:min(92vw,1500px)}
+.lb__fig img{max-width:min(92vw,1500px);max-height:78vh;width:auto;height:auto;object-fit:contain;
+  box-shadow:0 30px 80px rgba(0,0,0,.16)}
+.lb__cap{margin-top:16px;font-size:9.5px;letter-spacing:.2em;color:var(--ink-55)}
+.lb button{background:none;border:0;cursor:pointer;color:var(--ink);font-family:var(--mono);
+  text-transform:uppercase;position:absolute}
+.lb button:hover{color:var(--red)}
+.lb__x{top:var(--pad);right:var(--pad);font-size:11px;letter-spacing:.2em}
+.lb__nav{top:50%;transform:translateY(-50%);font-size:24px;padding:20px}
+.lb__prev{left:6px}.lb__next{right:6px}
+.lb__count{position:absolute;top:var(--pad);left:var(--pad);font-size:9.5px;letter-spacing:.2em;color:var(--ink-55)}
+</style>
+</head>
+<body>
+
+<span class="crop crop--tl"></span><span class="crop crop--tr"></span>
+<span class="crop crop--bl"></span><span class="crop crop--br"></span>
+
+<div class="bar">
+  <a class="bar__logo" href="index.html" aria-label="Sincerely YAS — home"><img src="assets/logo-red.png" alt="Sincerely YAS"></a>
+  <nav class="menu">
+    <a href="index.html#shopgrid">Shop</a>
+    <a href="index.html#about">About</a>
+    <a href="index.html#made">Made</a>
+    <a class="is-here" href="gallery.html">Gallery</a>
+    <a href="index.html#contact">Contact</a>
+    <a href="https://www.instagram.com/sincerely_yas/" target="_blank" rel="noopener">Instagram</a>
+    <a href="#">Stockists</a>
+    <a href="#">Cart (0)</a>
+  </nav>
+</div>
+
+<header class="head">
+  <h1>Gallery</h1>
+  <div class="meta">Vol. 01 — Canal St., New York — shot on film — [16]</div>
+</header>
+
+<main class="grid" id="grid">
+      <figure class="g__item" data-i="0" tabindex="0" role="button" aria-label="Enlarge The bar">
+        <img src="assets/hero-bar.jpg" alt="The bar" loading="lazy">
+        <figcaption>01 — The bar</figcaption>
+      </figure>
+      <figure class="g__item" data-i="1" tabindex="0" role="button" aria-label="Enlarge Ludlow & Canal">
+        <img src="assets/life-cafe.jpg" alt="Ludlow & Canal" loading="lazy">
+        <figcaption>02 — Ludlow & Canal</figcaption>
+      </figure>
+      <figure class="g__item" data-i="2" tabindex="0" role="button" aria-label="Enlarge Strawberries">
+        <img src="assets/life-couple.jpg" alt="Strawberries" loading="lazy">
+        <figcaption>03 — Strawberries</figcaption>
+      </figure>
+      <figure class="g__item" data-i="3" tabindex="0" role="button" aria-label="Enlarge The hand">
+        <img src="assets/lighter-cards.jpg" alt="The hand" loading="lazy">
+        <figcaption>04 — The hand</figcaption>
+      </figure>
+      <figure class="g__item" data-i="4" tabindex="0" role="button" aria-label="Enlarge The cap">
+        <img src="assets/hat-portrait.jpg" alt="The cap" loading="lazy">
+        <figcaption>05 — The cap</figcaption>
+      </figure>
+      <figure class="g__item" data-i="5" tabindex="0" role="button" aria-label="Enlarge Last light">
+        <img src="assets/life-two.jpg" alt="Last light" loading="lazy">
+        <figcaption>06 — Last light</figcaption>
+      </figure>
+      <figure class="g__item" data-i="6" tabindex="0" role="button" aria-label="Enlarge Three of us">
+        <img src="assets/shop-hat-2.jpg" alt="Three of us" loading="lazy">
+        <figcaption>07 — Three of us</figcaption>
+      </figure>
+      <figure class="g__item" data-i="7" tabindex="0" role="button" aria-label="Enlarge Last round">
+        <img src="assets/life-cards.jpg" alt="Last round" loading="lazy">
+        <figcaption>08 — Last round</figcaption>
+      </figure>
+      <figure class="g__item" data-i="8" tabindex="0" role="button" aria-label="Enlarge Table for four">
+        <img src="assets/lighter-redtable.jpg" alt="Table for four" loading="lazy">
+        <figcaption>09 — Table for four</figcaption>
+      </figure>
+      <figure class="g__item" data-i="9" tabindex="0" role="button" aria-label="Enlarge Gingham">
+        <img src="assets/lighter-gingham.jpg" alt="Gingham" loading="lazy">
+        <figcaption>10 — Gingham</figcaption>
+      </figure>
+      <figure class="g__item" data-i="10" tabindex="0" role="button" aria-label="Enlarge Ashtray">
+        <img src="assets/life-table.jpg" alt="Ashtray" loading="lazy">
+        <figcaption>11 — Ashtray</figcaption>
+      </figure>
+      <figure class="g__item" data-i="11" tabindex="0" role="button" aria-label="Enlarge The lighter">
+        <img src="assets/shop-lighter.jpg" alt="The lighter" loading="lazy">
+        <figcaption>12 — The lighter</figcaption>
+      </figure>
+      <figure class="g__item" data-i="12" tabindex="0" role="button" aria-label="Enlarge Jersey — front">
+        <img src="assets/jersey-front.jpg" alt="Jersey — front" loading="lazy">
+        <figcaption>13 — Jersey — front</figcaption>
+      </figure>
+      <figure class="g__item" data-i="13" tabindex="0" role="button" aria-label="Enlarge Number six">
+        <img src="assets/jersey-back.jpg" alt="Number six" loading="lazy">
+        <figcaption>14 — Number six</figcaption>
+      </figure>
+      <figure class="g__item" data-i="14" tabindex="0" role="button" aria-label="Enlarge The sleeve">
+        <img src="assets/jersey-sleeve.jpg" alt="The sleeve" loading="lazy">
+        <figcaption>15 — The sleeve</figcaption>
+      </figure>
+      <figure class="g__item" data-i="15" tabindex="0" role="button" aria-label="Enlarge Boiled wool">
+        <img src="assets/shop-hat.jpg" alt="Boiled wool" loading="lazy">
+        <figcaption>16 — Boiled wool</figcaption>
+      </figure>
+</main>
+
+<footer class="foot">
+  <div>Sincerely YAS © 2026</div>
+  <div><a href="index.html">← Back to shop</a></div>
+</footer>
+
+<div class="lb" id="lb" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Image viewer">
+  <div class="lb__count" id="lbCount"></div>
+  <button class="lb__x" type="button" id="lbX">Close ✕</button>
+  <button class="lb__nav lb__prev" type="button" id="lbPrev" aria-label="Previous">‹</button>
+  <figure class="lb__fig">
+    <img id="lbImg" src="" alt="">
+    <figcaption class="lb__cap" id="lbCap"></figcaption>
+  </figure>
+  <button class="lb__nav lb__next" type="button" id="lbNext" aria-label="Next">›</button>
+</div>
+
+<script>
+(function(){
+  const figs = [...document.querySelectorAll('.g__item')];
+  const lb = document.getElementById('lb');
+  const img = document.getElementById('lbImg');
+  const cap = document.getElementById('lbCap');
+  const cnt = document.getElementById('lbCount');
+  let i = 0;
+  function show(n){
+    i = (n + figs.length) % figs.length;
+    const f = figs[i];
+    img.src = f.querySelector('img').getAttribute('src');
+    img.alt = f.querySelector('img').alt || '';
+    cap.textContent = f.querySelector('figcaption').textContent;
+    cnt.textContent = String(i+1).padStart(2,'0') + ' / ' + String(figs.length).padStart(2,'0');
+  }
+  function open(n){ show(n); lb.classList.add('is-open'); lb.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
+  function close(){ lb.classList.remove('is-open'); lb.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
+  figs.forEach((f,n)=>{
+    f.addEventListener('click', ()=>open(n));
+    f.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open(n); } });
+  });
+  document.getElementById('lbX').addEventListener('click', close);
+  document.getElementById('lbPrev').addEventListener('click', e=>{ e.stopPropagation(); show(i-1); });
+  document.getElementById('lbNext').addEventListener('click', e=>{ e.stopPropagation(); show(i+1); });
+  lb.addEventListener('click', e=>{ if(e.target === lb) close(); });
+  document.addEventListener('keydown', e=>{
+    if(!lb.classList.contains('is-open')) return;
+    if(e.key==='Escape') close();
+    if(e.key==='ArrowRight') show(i+1);
+    if(e.key==='ArrowLeft') show(i-1);
+  });
+})();
+</script>
+</body>
+</html>
