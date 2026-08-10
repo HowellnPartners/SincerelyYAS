@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sincerely YAS</title>
+<title>Sincerely YAS — No. 001</title>
 <meta name="description" content="YAS is an independent clothing label creating thoughtfully crafted pieces that blur the line between fashion and art. Designed in New York City.">
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" href="favicon-512.png" type="image/png">
@@ -450,12 +450,16 @@ img{display:block;width:100%;height:auto}
 .form button:hover{background:var(--red)}
 .form__note{margin-top:15px;font-size:9.5px;letter-spacing:.18em;color:var(--ink-60)}
 
-/* two link columns */
+/* brand + two link columns */
 .foot__cols{
-  display:grid;grid-template-columns:1fr 1fr;gap:clamp(30px,6vw,110px);
-  max-width:820px;margin:0 auto;
+  display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:clamp(34px,5vw,90px);
+  max-width:1500px;margin:0 auto;
   padding:clamp(48px,7vw,100px) var(--pad);
+  align-items:start;
 }
+.foot__brandcol .wordmark{display:block;width:clamp(170px,17vw,250px)}
+.foot__brandcol .wordmark img{width:100%;height:auto}
+.foot__brandtag{margin-top:16px;font-size:10px;letter-spacing:.2em;color:var(--ink-60);line-height:2}
 .foot h4{font-weight:400;font-size:10px;letter-spacing:.24em;color:var(--ink-60);margin-bottom:20px}
 .foot ul{list-style:none;font-size:11.5px;letter-spacing:.14em}
 .foot li{margin-bottom:12px}
@@ -473,6 +477,10 @@ img{display:block;width:100%;height:auto}
 }
 .foot__bottom a:hover{color:var(--red)}
 
+@media(max-width:900px){
+  .foot__cols{grid-template-columns:1fr 1fr;gap:40px}
+  .foot__brandcol{grid-column:1 / -1;margin-bottom:8px}
+}
 @media(max-width:640px){
   .foot__cols{grid-template-columns:1fr;gap:36px;text-align:left}
   .foot__bottom{justify-content:flex-start;flex-direction:column;align-items:flex-start;gap:8px}
@@ -494,9 +502,9 @@ img{display:block;width:100%;height:auto}
 <div class="topbar">
 <div class="ticker">
   <div class="ticker__track">
-    <span>Vol. 01 — out now</span><span>■</span><span>Made in small runs</span><span>■</span>
+    <span>No. 001 — out now</span><span>■</span><span>Made in small runs</span><span>■</span>
     <span>Free shipping over $150</span><span>■</span><span>New York City</span><span>■</span>
-    <span>Vol. 01 — out now</span><span>■</span><span>Made in small runs</span><span>■</span>
+    <span>No. 001 — out now</span><span>■</span><span>Made in small runs</span><span>■</span>
     <span>Free shipping over $150</span><span>■</span><span>New York City</span><span>■</span>
   </div>
 </div>
@@ -531,13 +539,13 @@ img{display:block;width:100%;height:auto}
 
   <div class="hero__inner">
     <div class="hero__mark"><img src="logo-white.png" alt="Sincerely YAS"></div>
-    <div class="eyebrow" style="color:rgba(255,255,255,.75)"><span class="mark"></span>Vol. 01 — New York</div>
+    <div class="eyebrow" style="color:rgba(255,255,255,.75)"><span class="mark"></span>No. 001 — New York</div>
     <p class="hero__statement">
       A lighter, a jersey and a hat — made in small numbers, carried between the pitch,
       the corner table and the long way home. Everything here is sent out like a letter.
     </p>
     <div class="hero__cta">
-      <a class="btn" href="#shopgrid"><span>Shop Vol. 01</span><svg class="arw" viewBox="0 0 46 9" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true"><line x1="0" y1="4.5" x2="44" y2="4.5"/><path d="M39.5 1 44 4.5 39.5 8"/></svg></a>
+      <a class="btn" href="#shopgrid"><span>Shop No. 001</span><svg class="arw" viewBox="0 0 46 9" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true"><line x1="0" y1="4.5" x2="44" y2="4.5"/><path d="M39.5 1 44 4.5 39.5 8"/></svg></a>
       <a class="btn" href="#about"><span>The story</span><svg class="arw" viewBox="0 0 46 9" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true"><line x1="0" y1="4.5" x2="44" y2="4.5"/><path d="M39.5 1 44 4.5 39.5 8"/></svg></a>
     </div>
   </div>
@@ -561,7 +569,7 @@ img{display:block;width:100%;height:auto}
   <section class="feature rv" id="hat">
     <div class="feature__panel">
       <div class="feature__inner">
-        <div class="feature__idx"><span class="mark"></span>Featured — Vol. 01</div>
+        <div class="feature__idx"><span class="mark"></span>Featured — No. 001</div>
         <h2 class="feature__title">
           <span class="line1">The Hat</span>
           <span class="line2">boiled wool</span>
@@ -589,7 +597,7 @@ img{display:block;width:100%;height:auto}
           <circle cx="100" cy="100" r="72" stroke="#D4241B" stroke-width="1"/>
           <path id="stampPath" d="M100,18 a82,82 0 1,1 -0.1,0" fill="none"/>
           <text fill="#D4241B" font-family="'Roboto Mono',monospace" font-size="12.5" letter-spacing="2.55">
-            <textPath href="#stampPath" startOffset="0%">SINCERELY YAS ✳ NEW YORK ✳ VOL. 01 ✳ SMALL RUNS ✳</textPath>
+            <textPath href="#stampPath" startOffset="0%">SINCERELY YAS ✳ NEW YORK ✳ NO. 001 ✳ SMALL RUNS ✳</textPath>
           </text>
         </svg>
       </div>
@@ -602,7 +610,7 @@ img{display:block;width:100%;height:auto}
 
 <!-- ============ SHOP GRID ============ -->
 <section class="shop" id="shopgrid">
-  <h2 class="shop__title">Shop Vol. 01</h2>
+  <h2 class="shop__title">Shop No. 001</h2>
 
   <div class="shop__cols">
     <div class="shop__col shop__col--side" data-par="-1">
@@ -674,6 +682,10 @@ img{display:block;width:100%;height:auto}
   </div>
 
   <div class="foot__cols">
+    <div class="foot__brandcol">
+      <a class="wordmark" href="#top" aria-label="Sincerely YAS — home"><img src="logo-red.png" alt="Sincerely YAS"></a>
+      <div class="foot__brandtag">New York City<br>No. 001</div>
+    </div>
     <div>
       <h4>Information</h4>
       <ul>
@@ -691,7 +703,7 @@ img{display:block;width:100%;height:auto}
         <li><a href="#shopgrid">The Lighter</a></li>
         <li><a href="#shopgrid">The Jersey</a></li>
         <li><a href="#shopgrid">The Hat</a></li>
-        <li><a href="#shopgrid">Vol. 01</a></li>
+        <li><a href="#shopgrid">No. 001</a></li>
         <li><a href="#">Stockists</a></li>
       </ul>
     </div>
