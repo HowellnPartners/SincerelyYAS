@@ -476,6 +476,95 @@ img{display:block;width:100%;height:auto}
   .ticker__track{animation:none}
   html{scroll-behavior:auto}
 }
+
+/* ---------- cart ---------- */
+.cartbtn{
+  background:none;border:0;padding:0 0 2px;cursor:pointer;font-family:var(--mono);
+  font-size:13px;letter-spacing:.01em;color:inherit;text-transform:lowercase;
+  position:relative;opacity:.92;transition:opacity .2s ease;
+}
+.cartbtn:hover{opacity:1}
+.cartbtn::after{content:"";position:absolute;left:0;bottom:0;height:1px;width:0;background:currentColor;transition:width .3s ease}
+.cartbtn:hover::after{width:100%}
+.cartbtn.has-items{color:var(--red)}
+
+.cartveil{
+  position:fixed;inset:0;background:rgba(22,17,15,.34);z-index:190;
+  opacity:0;visibility:hidden;transition:opacity .45s ease,visibility .45s ease;
+}
+.cartveil.is-open{opacity:1;visibility:visible}
+
+.cart{
+  position:fixed;top:0;right:0;bottom:0;width:min(432px,100%);z-index:200;
+  background:var(--cream);display:flex;flex-direction:column;
+  transform:translateX(101%);transition:transform .55s cubic-bezier(.22,.61,.36,1);
+  border-left:1px solid var(--rule);
+}
+.cart.is-open{transform:none}
+.cart__bar{
+  display:flex;align-items:baseline;justify-content:space-between;flex:0 0 auto;
+  padding:26px clamp(20px,4vw,32px);border-bottom:1px solid var(--rule);
+}
+.cart__title{font-size:10.5px;letter-spacing:.26em}
+.cart__close{
+  background:none;border:0;padding:0;cursor:pointer;font-family:var(--mono);
+  font-size:10.5px;letter-spacing:.22em;text-transform:lowercase;color:var(--ink);
+  transition:color .3s ease;
+}
+.cart__close:hover{color:var(--red)}
+.cart__body{flex:1 1 auto;overflow-y:auto;padding:0 clamp(20px,4vw,32px)}
+.cart__empty{padding:clamp(48px,12vw,90px) 0;text-align:center;font-size:11px;letter-spacing:.16em;color:var(--ink-60)}
+.cart__empty button{
+  display:block;margin:22px auto 0;background:none;border:0;border-bottom:1px solid currentColor;
+  padding:0 0 8px;cursor:pointer;font-family:var(--mono);font-size:10px;letter-spacing:.24em;
+  text-transform:lowercase;color:var(--red);
+}
+.cart__item{display:grid;grid-template-columns:76px 1fr;gap:16px;padding:24px 0;border-bottom:1px dashed var(--rule)}
+.cart__thumb{background:#F4F2F1;aspect-ratio:3/4;overflow:hidden}
+.cart__thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.cart__name{font-size:12px;letter-spacing:.05em;line-height:1.35}
+.cart__meta{margin-top:5px;font-size:9.5px;letter-spacing:.18em;color:var(--ink-60)}
+.cart__line{display:flex;align-items:center;justify-content:space-between;margin-top:14px;gap:10px}
+.cart__qty{display:flex;align-items:center;border:1px dashed var(--rule)}
+.cart__qty button{
+  background:none;border:0;cursor:pointer;font-family:var(--mono);font-size:13px;
+  color:var(--ink-60);padding:5px 11px;line-height:1;transition:color .25s ease;
+}
+.cart__qty button:hover{color:var(--ink)}
+.cart__qty span{min-width:26px;text-align:center;font-size:11px}
+.cart__price{font-size:11px;letter-spacing:.14em;white-space:nowrap}
+.cart__remove{
+  background:none;border:0;padding:0;margin-top:10px;cursor:pointer;font-family:var(--mono);
+  font-size:9px;letter-spacing:.2em;text-transform:lowercase;color:var(--ink-60);
+  transition:color .25s ease;
+}
+.cart__remove:hover{color:var(--red)}
+.cart__foot{flex:0 0 auto;padding:22px clamp(20px,4vw,32px) clamp(22px,4vw,30px);border-top:1px solid var(--rule)}
+.cart__sub{display:flex;align-items:baseline;justify-content:space-between;font-size:11px;letter-spacing:.18em}
+.cart__note{margin-top:10px;font-size:9.5px;letter-spacing:.14em;color:var(--ink-60);line-height:1.9}
+.cart__checkout{
+  width:100%;margin-top:20px;background:var(--ink);color:var(--cream);border:0;cursor:pointer;
+  font-family:var(--mono);padding:19px;font-size:11px;letter-spacing:.24em;text-transform:lowercase;
+  transition:background .3s ease;
+}
+.cart__checkout:hover:not(:disabled){background:var(--red)}
+.cart__checkout:disabled{opacity:.32;cursor:not-allowed}
+.cart.is-busy{pointer-events:none}
+.cart.is-busy .cart__body{opacity:.45;transition:opacity .2s ease}
+
+.sizes button.is-sold{opacity:.32;text-decoration:line-through;cursor:not-allowed}
+.sizes button.is-sold:hover{color:var(--ink-60)}
+.addtocart:disabled{opacity:.4;cursor:not-allowed}
+.addtocart:disabled:hover{background:var(--ink)}
+
+@media(max-width:560px){
+  .cart{width:100%;border-left:0}
+  .cart__item{grid-template-columns:62px 1fr;gap:13px}
+}
+@media(prefers-reduced-motion:reduce){
+  .cart{transition:none}
+}
+
 </style>
 </head>
 <body>
@@ -502,7 +591,7 @@ img{display:block;width:100%;height:auto}
   <a class="nav__logo" href="#top" aria-label="Sincerely Yas — home"><img src="logo-red.svg" alt="Sincerely Yas"></a>
   <div class="nav__group nav__group--right">
     <a href="mailto:yasmain06@gmail.com">Contact</a>
-    <a href="#">Cart (0)</a>
+    <button class="cartbtn" id="cartOpen" type="button" aria-haspopup="dialog">Cart (<span id="cartCount">0</span>)</button>
   </div>
 </nav>
 </div><!-- /topbar -->
@@ -689,6 +778,22 @@ img{display:block;width:100%;height:auto}
 </footer>
 
 <!-- ============ PRODUCT DETAIL (overlay) ============ -->
+
+<!-- ============ CART ============ -->
+<div class="cartveil" id="cartVeil" hidden></div>
+<aside class="cart" id="cart" role="dialog" aria-modal="true" aria-label="Cart" aria-hidden="true">
+  <div class="cart__bar">
+    <div class="cart__title">Your cart</div>
+    <button class="cart__close" id="cartClose" type="button">Close <span aria-hidden="true">&#10005;</span></button>
+  </div>
+  <div class="cart__body" id="cartBody"></div>
+  <div class="cart__foot">
+    <div class="cart__sub"><span>Subtotal</span><span id="cartSub">$0</span></div>
+    <div class="cart__note">Free shipping across the US. All sales are final.<br>Taxes calculated at checkout.</div>
+    <button class="cart__checkout" id="cartCheckout" type="button" disabled>Checkout</button>
+  </div>
+</aside>
+
 <div class="pdp" id="pdp" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Product">
   <div class="pdp__bar">
     <span class="wordmark"><img src="logo-red.svg" alt="Sincerely Yas"></span>
@@ -871,10 +976,12 @@ img{display:block;width:100%;height:auto}
   const pdp = document.getElementById('pdp');
   if(!pdp) return;
   const $ = id => document.getElementById(id);
-  let qty = 1;
+  let qty = 1, currentKey = null, sizeIdx = 0;
+  window.SYPRODUCTS = PRODUCTS;
 
   function render(key){
     const p = PRODUCTS[key]; if(!p) return;
+    currentKey = key; sizeIdx = 0;
     $('pdpOrigin').textContent = p.origin;
     $('pdpName').textContent   = p.name;
     $('pdpDesc').textContent   = p.desc;
@@ -907,17 +1014,48 @@ img{display:block;width:100%;height:auto}
     $('pdpSizes').innerHTML = p.sizes.map((sz,i)=>
       '<button type="button" class="'+(i===0?'is-active':'')+'">'+sz+'</button>').join('');
     $('pdpSizeLabel').textContent = p.sizes[0];
-    $('pdpSizes').querySelectorAll('button').forEach(b=>{
+    $('pdpSizes').querySelectorAll('button').forEach((b,i)=>{
       b.addEventListener('click', ()=>{
+        if(b.disabled) return;
+        sizeIdx = i;
         $('pdpSizes').querySelectorAll('button').forEach(x=>x.classList.remove('is-active'));
         b.classList.add('is-active');
         $('pdpSizeLabel').textContent = b.textContent;
+        syncStock();
       });
     });
 
     qty = 1; $('pdpQty').textContent = '1';
     $('pdpAdd').textContent = 'Add to cart';
+    syncStock();
   }
+
+  // Reflects live Shopify stock on the size row and the buy button.
+  // No-ops until the storefront data has loaded, then runs again via SYPDPSync.
+  function syncStock(){
+    const api = window.SYCart, add = $('pdpAdd');
+    if(!api || !api.ready || !currentKey) return;
+    const btns = $('pdpSizes').querySelectorAll('button');
+    let firstOpen = -1;
+    btns.forEach((b,i)=>{
+      const ok = api.available(currentKey, i);
+      b.disabled = !ok;
+      b.classList.toggle('is-sold', !ok);
+      if(ok && firstOpen < 0) firstOpen = i;
+    });
+    // if the selected size is gone, fall to the first one that isn't
+    if(btns[sizeIdx] && btns[sizeIdx].disabled && firstOpen > -1){
+      sizeIdx = firstOpen;
+      btns.forEach(x=>x.classList.remove('is-active'));
+      btns[firstOpen].classList.add('is-active');
+      $('pdpSizeLabel').textContent = btns[firstOpen].textContent;
+    }
+    const price = api.price(currentKey);
+    if(price) $('pdpPrice').textContent = price;
+    if(firstOpen < 0){ add.disabled = true; add.textContent = 'Sold out'; }
+    else { add.disabled = false; if(add.textContent === 'Sold out') add.textContent = 'Add to cart'; }
+  }
+  window.SYPDPSync = syncStock;
 
   function open(key){
     render(key);
@@ -949,7 +1087,269 @@ img{display:block;width:100%;height:auto}
       $('pdpQty').textContent = qty;
     });
   });
-  $('pdpAdd').addEventListener('click', ()=>{ $('pdpAdd').textContent = 'Added ✓'; });
+    $('pdpAdd').addEventListener('click', async ()=>{
+    const btn = $('pdpAdd'), api = window.SYCart;
+    if(btn.disabled) return;
+    if(!api || !api.ready){ btn.textContent = api && api.failed ? 'Unavailable' : 'One moment\u2026'; return; }
+    btn.disabled = true; btn.textContent = 'Adding\u2026';
+    const ok = await api.add(currentKey, sizeIdx, qty);
+    btn.textContent = ok ? 'Added \u2713' : 'Try again';
+    setTimeout(()=>{ btn.disabled = false; syncStock(); if(btn.textContent!=='Sold out') btn.textContent = 'Add to cart'; }, 1600);
+    if(ok){ close(); api.open(); }
+  });
+})();
+
+/* ============================================================
+   CART — Shopify Buy SDK
+   We deliberately do NOT use Shopify's rendered Buy Button component;
+   it injects its own markup. We load the SDK, talk to the storefront
+   directly, and drive it from this site's own buttons.
+   ============================================================ */
+(function(){
+  const SHOP = {
+    domain : '7pd2wn-dx.myshopify.com',
+    token  : '5f29c1ff8d5c8fdb727e5bf05bd97a1f',
+    ids    : { lighter:'10466547106109', jersey:'10466618638653', hat:'10466630205757' }
+  };
+  const THUMB = { lighter:'shop-lighter.jpg', jersey:'jersey-worn.jpg', hat:'shop-hat.jpg' };
+  const SDK   = 'https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js';
+  const STORE_KEY = 'sy_checkout_v1';
+
+  const $ = id => document.getElementById(id);
+  const cart = $('cart'), veil = $('cartVeil'), body = $('cartBody');
+  if(!cart) return;
+
+  let client = null, checkout = null;
+  const VARIANTS = {};   // key -> [variant, ...] in site size order
+  const VMAP     = {};   // shopify variant id -> product key
+  const PRICE    = {};   // key -> "$55 USD"
+
+  /* ---------- helpers ---------- */
+  const money = v => {
+    const a = (v && v.amount != null) ? v.amount : v;
+    const n = Number(a);
+    if(!isFinite(n)) return '';
+    return '$' + (n % 1 === 0 ? n.toFixed(0) : n.toFixed(2));
+  };
+  const store = {
+    get(){ try{ return localStorage.getItem(STORE_KEY); }catch(e){ return null; } },
+    set(v){ try{ localStorage.setItem(STORE_KEY, v); }catch(e){} },
+    clear(){ try{ localStorage.removeItem(STORE_KEY); }catch(e){} }
+  };
+  const products = () => window.SYPRODUCTS || {};
+
+  function loadSDK(){
+    return new Promise((res, rej)=>{
+      if(window.ShopifyBuy && window.ShopifyBuy.buildClient) return res();
+      const el = document.createElement('script');
+      el.async = true; el.src = SDK;
+      el.onload = ()=> (window.ShopifyBuy && window.ShopifyBuy.buildClient) ? res() : rej();
+      el.onerror = rej;
+      document.head.appendChild(el);
+    });
+  }
+
+  // The SDK has accepted different id shapes across versions. Try them in turn.
+  async function fetchProduct(numericId){
+    const forms = [
+      'gid://shopify/Product/' + numericId,
+      numericId,
+      (window.btoa ? window.btoa('gid://shopify/Product/' + numericId) : null)
+    ].filter(Boolean);
+    for(const f of forms){
+      try{ const p = await client.product.fetch(f); if(p) return p; }catch(e){}
+    }
+    return null;
+  }
+
+  // Site size labels are prettier than Shopify's ("S — fits S/M" vs "S").
+  // Match on the leading token; fall back to position.
+  function orderVariants(key, shopifyVariants){
+    const labels = (products()[key] || {}).sizes || [];
+    if(shopifyVariants.length === 1) return labels.map(()=> shopifyVariants[0]);
+    const token = t => String(t).split(/[\s—–-]/)[0].trim().toUpperCase();
+    return labels.map((label, i) => {
+      const hit = shopifyVariants.find(v => token(v.title) === token(label));
+      return hit || shopifyVariants[i] || null;
+    });
+  }
+
+  /* ---------- checkout ---------- */
+  async function getCheckout(){
+    const id = store.get();
+    if(id){
+      try{
+        const c = await client.checkout.fetch(id);
+        if(c && !c.completedAt) return c;
+      }catch(e){}
+      store.clear();
+    }
+    const c = await client.checkout.create();
+    store.set(c.id);
+    return c;
+  }
+
+  async function mutate(fn){
+    cart.classList.add('is-busy');
+    try{ checkout = await fn(); }
+    catch(e){ console.warn('[cart]', e); }
+    cart.classList.remove('is-busy');
+    render();
+  }
+
+  /* ---------- rendering ---------- */
+  function render(){
+    const items = (checkout && checkout.lineItems) || [];
+    const count = items.reduce((n,li)=> n + li.quantity, 0);
+
+    const badge = $('cartCount'), btn = $('cartOpen');
+    if(badge) badge.textContent = count;
+    if(btn) btn.classList.toggle('has-items', count > 0);
+
+    if(!items.length){
+      body.innerHTML =
+        '<div class="cart__empty">Nothing here yet.' +
+        '<button type="button" id="cartShop">See no. 001</button></div>';
+      const go = $('cartShop');
+      if(go) go.addEventListener('click', ()=>{
+        closeCart();
+        const t = document.getElementById('shopgrid');
+        if(t) t.scrollIntoView({behavior:'smooth'});
+      });
+    } else {
+      body.innerHTML = items.map(li=>{
+        const key   = VMAP[li.variant && li.variant.id] || '';
+        const img   = THUMB[key] || (li.variant && li.variant.image && li.variant.image.src) || '';
+        const size  = (li.variant && li.variant.title) || '';
+        const unit  = li.variant && li.variant.price;
+        const amt   = unit && unit.amount != null ? unit.amount : unit;
+        const line  = money(Number(amt) * li.quantity);
+        const showSize = size && size.toLowerCase() !== 'default title';
+        return (
+          '<div class="cart__item" data-id="' + li.id + '">' +
+            '<div class="cart__thumb">' + (img ? '<img src="'+img+'" alt="">' : '') + '</div>' +
+            '<div>' +
+              '<div class="cart__name">' + li.title + '</div>' +
+              (showSize ? '<div class="cart__meta">Size ' + size + '</div>' : '') +
+              '<div class="cart__line">' +
+                '<div class="cart__qty">' +
+                  '<button type="button" data-step="-1" aria-label="One fewer">&#8722;</button>' +
+                  '<span>' + li.quantity + '</span>' +
+                  '<button type="button" data-step="1" aria-label="One more">+</button>' +
+                '</div>' +
+                '<div class="cart__price">' + line + '</div>' +
+              '</div>' +
+              '<button class="cart__remove" type="button" data-remove>Remove</button>' +
+            '</div>' +
+          '</div>'
+        );
+      }).join('');
+
+      body.querySelectorAll('.cart__item').forEach(row=>{
+        const id = row.dataset.id;
+        const li = items.find(x=> x.id === id);
+        row.querySelectorAll('.cart__qty button').forEach(b=>{
+          b.addEventListener('click', ()=>{
+            const next = li.quantity + parseInt(b.dataset.step, 10);
+            if(next < 1) return removeLine(id);
+            mutate(()=> client.checkout.updateLineItems(checkout.id, [{id, quantity: next}]));
+          });
+        });
+        row.querySelector('[data-remove]').addEventListener('click', ()=> removeLine(id));
+      });
+    }
+
+    const sub = checkout && (checkout.subtotalPriceV2 || checkout.subtotalPrice);
+    $('cartSub').textContent = items.length ? (money(sub) || '$0') : '$0';
+    $('cartCheckout').disabled = !items.length;
+  }
+
+  function removeLine(id){
+    mutate(()=> client.checkout.removeLineItems(checkout.id, [id]));
+  }
+
+  /* ---------- open / close ---------- */
+  let lastFocus = null;
+  function openCart(){
+    lastFocus = document.activeElement;
+    veil.hidden = false;
+    requestAnimationFrame(()=>{
+      veil.classList.add('is-open');
+      cart.classList.add('is-open');
+    });
+    cart.setAttribute('aria-hidden','false');
+    document.body.style.overflow = 'hidden';
+    $('cartClose').focus();
+  }
+  function closeCart(){
+    veil.classList.remove('is-open');
+    cart.classList.remove('is-open');
+    cart.setAttribute('aria-hidden','true');
+    document.body.style.overflow = '';
+    setTimeout(()=>{ veil.hidden = true; }, 460);
+    if(lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  $('cartOpen') && $('cartOpen').addEventListener('click', openCart);
+  $('cartClose').addEventListener('click', closeCart);
+  veil.addEventListener('click', closeCart);
+  document.addEventListener('keydown', e=>{
+    if(e.key === 'Escape' && cart.classList.contains('is-open')) closeCart();
+  });
+  $('cartCheckout').addEventListener('click', ()=>{
+    if(checkout && checkout.webUrl) window.location.href = checkout.webUrl;
+  });
+
+  /* ---------- public surface, used by the product overlay ---------- */
+  const api = window.SYCart = {
+    ready: false,
+    failed: false,
+    available(key, i){
+      const v = (VARIANTS[key] || [])[i];
+      return !!(v && v.available !== false);
+    },
+    price(key){ return PRICE[key] || ''; },
+    open: openCart,
+    close: closeCart,
+    async add(key, i, quantity){
+      const v = (VARIANTS[key] || [])[i];
+      if(!v || !checkout) return false;
+      try{
+        checkout = await client.checkout.addLineItems(
+          checkout.id, [{ variantId: v.id, quantity: Math.max(1, quantity|0) }]
+        );
+        render();
+        return true;
+      }catch(e){ console.warn('[cart] add failed', e); return false; }
+    }
+  };
+
+  /* ---------- boot ---------- */
+  (async function init(){
+    render();                       // empty state first, so the drawer always works
+    try{
+      await loadSDK();
+      client = ShopifyBuy.buildClient({ domain: SHOP.domain, storefrontAccessToken: SHOP.token });
+
+      await Promise.all(Object.keys(SHOP.ids).map(async key=>{
+        const prod = await fetchProduct(SHOP.ids[key]);
+        if(!prod) return;
+        const vs = prod.variants || [];
+        VARIANTS[key] = orderVariants(key, vs);
+        vs.forEach(v=>{ VMAP[v.id] = key; });
+        const first = vs[0];
+        if(first) PRICE[key] = money(first.price) + ' USD';
+      }));
+
+      checkout = await getCheckout();
+      api.ready = true;
+      render();
+      if(window.SYPDPSync) window.SYPDPSync();
+    }catch(e){
+      api.failed = true;
+      console.warn('[cart] storefront unavailable', e);
+    }
+  })();
 })();
 
 const rv = document.querySelectorAll('.rv');
