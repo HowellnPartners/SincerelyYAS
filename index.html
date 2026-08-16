@@ -477,6 +477,36 @@ img{display:block;width:100%;height:auto}
   html{scroll-behavior:auto}
 }
 
+.vh{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
+  clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
+:focus-visible{outline:1px solid var(--red);outline-offset:3px}
+
+/* ---------- info panel ---------- */
+.info{
+  position:fixed;top:0;right:0;bottom:0;width:min(480px,100%);z-index:200;
+  background:var(--cream);display:flex;flex-direction:column;
+  transform:translateX(101%);transition:transform .55s cubic-bezier(.22,.61,.36,1);
+  border-left:1px solid var(--rule);
+}
+.info.is-open{transform:none}
+.info__bar{
+  display:flex;align-items:baseline;justify-content:space-between;flex:0 0 auto;
+  padding:26px clamp(20px,4vw,32px);border-bottom:1px solid var(--rule);
+}
+.info__title{font-size:10.5px;letter-spacing:.26em}
+.info__body{flex:1 1 auto;overflow-y:auto;padding:clamp(24px,4vw,36px) clamp(20px,4vw,32px)}
+.info__body h5{font-weight:400;font-size:11px;letter-spacing:.22em;margin:0 0 14px}
+.info__body h5+p{margin-top:0}
+.info__body p{font-size:11.5px;line-height:2.05;color:var(--ink-60);margin:0 0 26px;max-width:46ch}
+.info__body table{width:100%;border-collapse:collapse;margin:0 0 30px;font-size:10.5px;letter-spacing:.08em}
+.info__body th,.info__body td{text-align:left;padding:11px 8px 11px 0;border-bottom:1px dashed var(--rule)}
+.info__body th{color:var(--ink);font-weight:400;letter-spacing:.16em}
+.info__body td{color:var(--ink-60)}
+.info__body a{color:var(--red);border-bottom:1px solid currentColor}
+.info__sep{height:1px;background:var(--rule);margin:0 0 30px}
+@media(max-width:560px){ .info{width:100%;border-left:0} }
+@media(prefers-reduced-motion:reduce){ .info{transition:none} }
+
 /* ---------- cart ---------- */
 .cartbtn{
   background:none;border:0;padding:0 0 2px;cursor:pointer;font-family:var(--mono);
@@ -608,7 +638,7 @@ img{display:block;width:100%;height:auto}
   <div class="hero__scrim"></div>
 
   <div class="hero__inner">
-    <div class="hero__mark"><img src="logo-white.svg" alt="Sincerely Yas"></div>
+    <h1 class="hero__mark"><img src="logo-white.svg" alt=""><span class="vh">Sincerely Yas — no. 001, New York</span></h1>
     <div class="eyebrow" style="color:rgba(255,255,255,.75)"><span class="mark"></span>No. 001 — New York</div>
     <p class="hero__statement">
       A lighter, a jersey and a hat — made in small numbers, carried between the pitch,
@@ -752,9 +782,9 @@ img{display:block;width:100%;height:auto}
         <li><a href="mailto:yasmain06@gmail.com">Contact</a></li>
         <li><a href="#made">Made</a></li>
         <li><a href="gallery.html">Gallery</a></li>
-        <li><a href="#">Shipping</a></li>
-        <li><a href="#">All sales are final</a></li>
-        <li><a href="#">Size guide</a></li>
+        <li><a href="#" data-info="shipping">Shipping</a></li>
+        <li><a href="#" data-info="returns">All sales are final</a></li>
+        <li><a href="#" data-info="sizes">Size guide</a></li>
       </ul>
     </div>
     <div>
@@ -778,6 +808,15 @@ img{display:block;width:100%;height:auto}
 </footer>
 
 <!-- ============ PRODUCT DETAIL (overlay) ============ -->
+
+<!-- ============ INFO ============ -->
+<aside class="info" id="info" role="dialog" aria-modal="true" aria-label="Information" aria-hidden="true">
+  <div class="info__bar">
+    <div class="info__title" id="infoTitle">Information</div>
+    <button class="cart__close" id="infoClose" type="button">Close <span aria-hidden="true">&#10005;</span></button>
+  </div>
+  <div class="info__body" id="infoBody"></div>
+</aside>
 
 <!-- ============ CART ============ -->
 <div class="cartveil" id="cartVeil" hidden></div>
@@ -942,6 +981,23 @@ img{display:block;width:100%;height:auto}
 })();
 
 /* ---------- product detail overlay ---------- */
+/* Overlays lock page scroll. Locking alone can drift the scroll position, so we
+   remember it on the way in and restore it on the way out. Reference-counted,
+   because the cart and the info panel can hand over to each other. */
+window.SYLock = (function(){
+  let y = 0, depth = 0;
+  return {
+    on(){ if(depth++ === 0){ y = window.scrollY; document.body.style.overflow = 'hidden'; } },
+    off(force){
+      if(force) depth = 0; else depth = Math.max(0, depth - 1);
+      if(depth === 0){
+        document.body.style.overflow = '';
+        window.scrollTo({top: y, left: 0, behavior: 'instant'});
+      }
+    }
+  };
+})();
+
 (function(){
   const PRODUCTS = {
     lighter: {
@@ -1061,17 +1117,17 @@ img{display:block;width:100%;height:auto}
     render(key);
     pdp.classList.add('is-open');
     pdp.setAttribute('aria-hidden','false');
-    document.body.style.overflow = 'hidden';
+    window.SYLock.on();
     pdp.scrollTop = 0;
   }
   function close(){
     pdp.classList.remove('is-open');
     pdp.setAttribute('aria-hidden','true');
-    document.body.style.overflow = '';
+    window.SYLock.off();
   }
 
   document.querySelectorAll('[data-product]').forEach(el=>{
-    el.addEventListener('click', ()=>open(el.dataset.product));
+    el.addEventListener('click', e=>{ e.preventDefault(); open(el.dataset.product); });
     el.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open(el.dataset.product); } });
   });
   pdp.querySelector('.pdp__close').addEventListener('click', close);
@@ -1278,15 +1334,17 @@ img{display:block;width:100%;height:auto}
       cart.classList.add('is-open');
     });
     cart.setAttribute('aria-hidden','false');
-    document.body.style.overflow = 'hidden';
+    window.SYLock.on();
     $('cartClose').focus();
   }
   function closeCart(){
     veil.classList.remove('is-open');
     cart.classList.remove('is-open');
     cart.setAttribute('aria-hidden','true');
-    document.body.style.overflow = '';
-    setTimeout(()=>{ veil.hidden = true; }, 460);
+    const info = document.getElementById('info');
+    const infoOpen = info && info.classList.contains('is-open');
+    if(!infoOpen) window.SYLock.off();
+    setTimeout(()=>{ if(!info || !info.classList.contains('is-open')) veil.hidden = true; }, 460);
     if(lastFocus && lastFocus.focus) lastFocus.focus();
   }
 
@@ -1345,11 +1403,96 @@ img{display:block;width:100%;height:auto}
       api.ready = true;
       render();
       if(window.SYPDPSync) window.SYPDPSync();
+      // the gallery's cart link lands here with ?cart=1
+      if(/[?&]cart=1/.test(location.search)){
+        openCart();
+        history.replaceState(null, '', location.pathname + location.hash);
+      }
     }catch(e){
       api.failed = true;
       console.warn('[cart] storefront unavailable', e);
     }
   })();
+})();
+
+/* ---------- information panel ---------- */
+(function(){
+  const panel = document.getElementById('info');
+  if(!panel) return;
+  const veil = document.getElementById('cartVeil');
+  const PANELS = {
+    shipping: ['Shipping', `
+      <h5>Free shipping across the US</h5>
+      <p>Every order ships free within the United States. There is no minimum and no
+         threshold to reach &mdash; the price you see is the price you pay.</p>
+      <h5>Dispatch</h5>
+      <p>Orders are packed and sent from New York. Everything is made in small runs, so
+         allow a few days before it leaves us. You'll get a confirmation by email when
+         the order is placed, and again when it ships.</p>
+      <h5>Outside the US</h5>
+      <p>Not shipping internationally at the moment. If you're abroad and want a piece,
+         write to <a href="mailto:yasmain06@gmail.com">yasmain06@gmail.com</a> and we'll
+         see what we can do.</p>`],
+    returns: ['All sales are final', `
+      <h5>All sales are final</h5>
+      <p>No. 001 is a limited run, so we don't accept returns or exchanges. Please check
+         the size guide before ordering &mdash; and if you're unsure, ask us first.
+         We'd much rather answer a question than have a piece not fit.</p>
+      <h5>If something's wrong</h5>
+      <p>If your order arrives damaged, or it isn't what you ordered, that's on us. Email
+         <a href="mailto:yasmain06@gmail.com">yasmain06@gmail.com</a> within seven days of
+         delivery with a photo and we'll put it right.</p>`],
+    sizes: ['Size guide', `
+      <h5>The Other Side Jersey</h5>
+      <p>Cut boxy and unisex, meant to sit loose. Four sizes:</p>
+      <table>
+        <tr><th>S</th><td>Unisex</td></tr>
+        <tr><th>M</th><td>Unisex</td></tr>
+        <tr><th>L</th><td>Unisex</td></tr>
+        <tr><th>XL</th><td>Unisex</td></tr>
+      </table>
+      <h5>The Paperboy Hat</h5>
+      <p>An elastic sweatband gives a little either way, so each size covers two.</p>
+      <table>
+        <tr><th>S</th><td>Fits small to medium</td></tr>
+        <tr><th>M</th><td>Fits medium to large</td></tr>
+      </table>
+      <h5>The Lighter</h5>
+      <p>One size.</p>
+      <div class="info__sep"></div>
+      <p>Want exact measurements before you order? Write to
+         <a href="mailto:yasmain06@gmail.com">yasmain06@gmail.com</a> and we'll measure
+         the piece for you.</p>`]
+  };
+  let lastFocus = null;
+  function open(key){
+    const entry = PANELS[key]; if(!entry) return;
+    document.getElementById('infoTitle').textContent = entry[0];
+    document.getElementById('infoBody').innerHTML = entry[1];
+    document.getElementById('infoBody').scrollTop = 0;
+    lastFocus = document.activeElement;
+    veil.hidden = false;
+    requestAnimationFrame(()=>{ veil.classList.add('is-open'); panel.classList.add('is-open'); });
+    panel.setAttribute('aria-hidden','false');
+    window.SYLock.on();
+    document.getElementById('infoClose').focus();
+  }
+  function close(){
+    veil.classList.remove('is-open');
+    panel.classList.remove('is-open');
+    panel.setAttribute('aria-hidden','true');
+    window.SYLock.off();
+    setTimeout(()=>{ if(!document.getElementById('cart').classList.contains('is-open')) veil.hidden = true; }, 460);
+    if(lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  document.querySelectorAll('[data-info]').forEach(a=>{
+    a.addEventListener('click', e=>{ e.preventDefault(); open(a.dataset.info); });
+  });
+  document.getElementById('infoClose').addEventListener('click', close);
+  veil.addEventListener('click', ()=>{ if(panel.classList.contains('is-open')) close(); });
+  document.addEventListener('keydown', e=>{
+    if(e.key === 'Escape' && panel.classList.contains('is-open')) close();
+  });
 })();
 
 const rv = document.querySelectorAll('.rv');
